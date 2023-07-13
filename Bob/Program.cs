@@ -73,9 +73,9 @@ async Task<BigInteger> DoMultiplication(BigInteger a, BigInteger b)
     await Task.Delay(500);
     var aliceResult = await ExchangeBeaverMul(new BeaverMulIntermediate(e1, f1));
 
-    BigInteger e = e1 + aliceResult.e;
-    BigInteger f = f1 + aliceResult.f;
-    BigInteger r1 = e * f + f * triples.x + e * triples.y + triples.z;
+    BigInteger e = (e1 + aliceResult.e) % Constants.L;
+    BigInteger f = (f1 + aliceResult.f) % Constants.L;
+    BigInteger r1 = (e * f + f * triples.x + e * triples.y + triples.z) % Constants.L;
 
     await Task.Delay(500);
     BigInteger r0 = await ExchangeResult(r1);

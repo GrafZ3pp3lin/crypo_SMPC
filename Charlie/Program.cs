@@ -6,6 +6,8 @@ Console.WriteLine("Charlie");
 
 var random = new Random();
 
+var lockObject = new object();
+
 var triples = new List<BeaverDoubleTriple>();
 var personTripleCount = new Dictionary<string, int>();
 
@@ -26,12 +28,15 @@ void ReceiveEvent(object? sender, MessageEventArgs args) {
     {
         var count = 0;
         var cast = (Person)sender;
-        if (personTripleCount.ContainsKey(cast.Name))
+        lock (lockObject)
         {
-            count = personTripleCount[cast.Name];
+            if (!personTripleCount.TryGetValue(cast.Name, out count))
+            {
+                count = 0;
+            }
+            personTripleCount[cast.Name] = count + 1;
         }
         var doubleTriple = triples[count];
-        personTripleCount[cast.Name] = count + 1;
         BeaverTriple triple;
         if (cast.Name.Equals("Alice"))
         {
@@ -53,8 +58,7 @@ void ReceiveEvent(object? sender, MessageEventArgs args) {
 
 BigInteger GetRandomNumber()
 {
-    //return (BigInteger)(long)Math.Ceiling(random.NextDouble() * Constants.L);
-    return (BigInteger)random.Next();
+    return (BigInteger)random.NextInt64();
 }
 
 BeaverDoubleTriple Generate_Beaver_Triple()
